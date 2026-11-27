@@ -2102,7 +2102,7 @@ const ATTENDEES = [
 /* ================= ROLE: Member / Admin (switched from the account menu, like Smart Networks) ================= */
 
 const ROLES = { member: "Member", admin: "Admin" };
-let role = "member";
+let role = "admin"; // first visit opens as Admin; a role picked from the account menu is remembered after that
 try { if (ROLES[localStorage.getItem("demoRole")]) role = localStorage.getItem("demoRole"); } catch {}
 const isAdmin = () => role === "admin";
 
