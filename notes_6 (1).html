@@ -1942,7 +1942,9 @@ body.demoing #mbar{display:none!important}
 }
 </style>
 </head>
-<body>
+<!-- starts collapsed: the script only runs after the image store has loaded (can take a second or two), so without
+     this the sidebar would show open first and then slide shut -->
+<body class="collapsed">
 <div id="app">
   <aside id="sidebar">
     <div class="brand"><!-- Only shown inside the YPO events app: back to the dashboard -->

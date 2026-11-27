@@ -4628,7 +4628,7 @@ function renderMeMenu(open) {
       </div>
       <em class="fo-tag sm ${role === "admin" ? "on" : ""}">${ROLES[role]}</em>
     </div>
-    <button type="button" role="menuitem" data-demo="My Profile" class="fo-nav-row">
+    <button type="button" role="menuitem" data-soon="My Profile" class="fo-nav-row">
       <svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
       My Profile
     </button>
@@ -5617,7 +5617,10 @@ document.addEventListener("click", (ev) => {
     return toast(`${demo.dataset.demo} isn't part of this demo`);
   }
   const soon = ev.target.closest("[data-soon]");
-  if (soon) return toast(`${soon.dataset.soon} coming soon`);
+  if (soon) {
+    renderMeMenu(false);
+    return toast(`${soon.dataset.soon} coming soon`);
+  }
 
   // Team takeaways screen: department filter + reminders
   const tkDept = ev.target.closest("[data-tk-dept]");
