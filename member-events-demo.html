@@ -288,7 +288,7 @@
     /* the base .fo style paints white; let the canvas show through the layout wrappers */
     .ev-canvas #app > .fo{background:transparent}
     .ev-canvas #subBar.fo{background:transparent;border-bottom-color:#ece4dc}
-    .ev-canvas #topNav{position:relative;z-index:1}
+    .ev-canvas #topNav{position:relative;z-index:55}
     .ev-canvas .fo-panel{background:#fff;border-color:#efe5dc;border-radius:18px;
       box-shadow:0 1px 2px rgba(28,25,23,.04),0 18px 40px -24px rgba(28,25,23,.22)}
     .ev-canvas .exec-dashboard.ex-embed .ex-card{border-color:#efe5dc;border-radius:18px;
@@ -902,7 +902,9 @@
     .fo-menu button:hover{background:#fbf7f0;color:var(--pv-gold-deep)}
 
     /* ---- Header: Privé bar — logo left, paper glass, hairline; user pill on the right ---- */
-    #topNav{height:68px;background:rgba(251,249,247,.92)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--pv-line);padding-left:clamp(12px,3vw,40px);padding-right:clamp(12px,3vw,40px)}
+    /* The blur makes the header its own layer, which traps the account menu inside it; so lift the whole header above
+       page content (cards, the Top 3/10 filter, "View more" at z 40) but keep it under sheets and modals (z 60+) */
+    #topNav{position:relative;z-index:55;height:68px;background:rgba(251,249,247,.92)!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--pv-line);padding-left:clamp(12px,3vw,40px);padding-right:clamp(12px,3vw,40px)}
     .fo-brand{gap:12px;padding:0 10px 0 2px}
     .fo-brand:hover{background:transparent}
     .fo-brand:hover .nm{color:var(--pv-gold-deep)}
@@ -5588,6 +5590,12 @@ document.addEventListener("click", (ev) => {
   if (ev.target.closest("[data-roles-toggle]")) { rolesOpen = !rolesOpen; return renderMeMenu(true); }
   const pick = ev.target.closest("[data-switch-role]");
   if (pick) {
+    // Member view isn't ready yet: show the coming soon toast and stay on the current role
+    if (pick.dataset.switchRole === "member" && role !== "member") {
+      rolesOpen = false;
+      renderMeMenu(false);
+      return toast("Member view is coming soon");
+    }
     if (pick.dataset.switchRole !== role) return switchRole(pick.dataset.switchRole);
     rolesOpen = false;
     return renderMeMenu(true);
