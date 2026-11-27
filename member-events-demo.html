@@ -4409,6 +4409,8 @@ window.addEventListener("message", (ev) => {
   if (!event) return;
   if (ev.data?.type === "smartnotes:open-room") location.hash = `#/room/${id}`;
   if (ev.data?.type === "smartnotes:back") location.hash = backHref(`#/events?tab=${tabOf(event)}`);
+  // Toolbar back arrow (left of the sidebar toggle): always the events list on the Live & Upcoming tab
+  if (ev.data?.type === "smartnotes:events") location.hash = "#/events?tab=current";
 });
 
 /* ================= REGISTER FORM ================= */
