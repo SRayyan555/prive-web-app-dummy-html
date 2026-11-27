@@ -4699,8 +4699,8 @@ function toast(msg) {
 
 /* ================= ADMIN ONBOARDING: company profile, filled once (first time an admin comes in) ================= */
 
-let onboarded = false;
-try { onboarded = localStorage.getItem("demoOnboarded") === "1"; } catch {}
+// Onboarding is no longer forced on first visit, so admins always count as onboarded (keeps the "Events" link on the form)
+let onboarded = true;
 
 const OB_STEPS = [
   { title: "Company Information", sub: "Your business details" },
@@ -5407,8 +5407,8 @@ function route() {
   renderMeMenu(false);
   const event = id && EVENTS.find((e) => e.id === id);
 
-  // First time an admin comes in, the company onboarding comes before anything else
-  if (isAdmin() && !onboarded && page !== "onboarding") return location.replace("#/onboarding");
+  // Opening the bare link as an admin lands on the dashboard (onboarding is skipped; it's still in the drawer)
+  if (isAdmin() && !page) return location.replace("#/dashboard");
   trackNav();
 
   currentPage = page || "events";
