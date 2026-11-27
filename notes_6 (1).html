@@ -1956,7 +1956,7 @@ body.demoing #mbar{display:none!important}
     </div>
     <nav id="tree"></nav>
     <div class="side-foot">
-      <button class="tb" id="themeBtn" title="Toggle theme"><svg class="i" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16.5 11.5A3.5 3.5 0 0 0 13 8m.5-5.5v2m6.002 0l-1.5 1.499m3.5 4.501h-2M17 16.531A6.305 6.305 0 0 1 8.469 8A7.094 7.094 0 1 0 17 16.531"/></svg></button>
+      <button class="tb" id="themeBtn" title="Toggle theme" hidden style="display:none"><svg class="i" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16.5 11.5A3.5 3.5 0 0 0 13 8m.5-5.5v2m6.002 0l-1.5 1.499m3.5 4.501h-2M17 16.531A6.305 6.305 0 0 1 8.469 8A7.094 7.094 0 1 0 17 16.531"/></svg></button>
       <span id="count" class="grow"></span>
       <button class="hostlink" id="hostBtn" title="Dashboard, sessions and team for admins (Alt+Shift+H)">Admin console</button>
     </div>
@@ -2128,7 +2128,7 @@ function seed(){
         '<p>Everything saves automatically on this device.</p>'}
     ],
     active:'n1', collapsed:true,
-    theme: matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'
+    theme: 'light' // light only for now (dark theme switched off)
   };
 }
 function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch{return null}}
@@ -2171,7 +2171,8 @@ const fmtFull=ts=>{const d=new Date(ts);return d.toLocaleDateString([],{day:'num
 const snippet=n=>strip(n.html).replace(/\s+/g,' ').trim().slice(0,80)||'No additional text';
 
 /* ---------- theme / sidebar ---------- */
-function applyTheme(){document.documentElement.dataset.theme=S.theme}
+// Light only for now: ignore any saved or system dark preference (flip back to S.theme to re-enable dark)
+function applyTheme(){S.theme='light';document.documentElement.dataset.theme='light'}
 function applySide(){document.body.classList.toggle('collapsed',!!S.collapsed)}
 $('#themeBtn').onclick=()=>{S.theme=S.theme==='dark'?'light':'dark';applyTheme();save()};
 function toggleSide(){S.collapsed=!S.collapsed;applySide();save()}
