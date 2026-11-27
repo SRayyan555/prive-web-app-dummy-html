@@ -3520,7 +3520,7 @@ function pvCiTick() {
   if (pvCi.t < PV_CI_MS) return;
   exState.ciSlide += 1;
   exState.ciAnim = 1;
-  sec.outerHTML = exCollective(null, !!sec.closest(".ex-embed"));
+  sec.outerHTML = exCollective(null, sec.classList.contains("no-title"));
   if (typeof pvUpdateMore === "function") pvUpdateMore();
 }
 setInterval(pvCiTick, 100);
@@ -3532,7 +3532,7 @@ document.addEventListener("click", (ev) => {
   exState.ciPaused = !exState.ciPaused;
   pvCi.dot = null; // playing again starts a fresh countdown
   const sec = b.closest(".pv-ci");
-  sec.outerHTML = exCollective(null, !!sec.closest(".ex-embed"));
+  sec.outerHTML = exCollective(null, sec.classList.contains("no-title"));
   document.querySelector("[data-pv-ci-play]")?.focus();
 });
 
@@ -3919,7 +3919,7 @@ function renderDashboard() {
   return `
   <div class="exec-dashboard min-h-full">
     <div class="w-full px-4 md:px-8 pt-6 pb-16 flex flex-col gap-5">
-      ${exCollective(o)}
+      ${exCollective(o, true) /* same as the member screen for now: no title row, filter inside the card */}
       ${exEventsPill(o)}
       ${exEvents(o)}
     </div>
@@ -4065,7 +4065,7 @@ function renderRoom(e, from = "notes") {
   const regOpen = e.registrationOpen !== false;
   const back = from === "notes"
     ? { href: backHref(`#/smart-notes/${e.id}`), label: "Back", crumb: `<a href="#/smart-notes/${e.id}">Smart Notes</a>` }
-    : { href: backHref(`#/events?tab=${tabOf(e)}`), label: "Back", crumb: `<a href="#/events?tab=${tabOf(e)}">Dashboard</a>` };
+    : { href: backHref(`#/events?tab=${tabOf(e)}`), label: "Back", crumb: `<a href="#/events?tab=${tabOf(e)}">Events</a>` };
   const fields = [
     { label: "Venue", icon: FI.pin, value: esc(e.venue) },
     { label: "Date", icon: FI.date, value: esc(dateRange(e)) },
@@ -4347,7 +4347,7 @@ function renderTakeaways(e) {
     ${foTop({
       back: backHref(`#/events?tab=${tabOf(e)}`),
       backLabel: "Back",
-      crumbs: `<a href="#/events?tab=${tabOf(e)}">Dashboard</a><i>/</i><a href="#/events/${e.id}">${esc(e.name)}</a><i>/</i><b>Team takeaways</b>`,
+      crumbs: `<a href="#/events?tab=${tabOf(e)}">Events</a><i>/</i><a href="#/events/${e.id}">${esc(e.name)}</a><i>/</i><b>Team takeaways</b>`,
       right: `<a href="#/smart-notes/${e.id}" class="fo-tb" aria-label="Smart Notes" title="Smart Notes">${FI.notes}</a>`,
     })}
     <div class="fo-scroll">
@@ -4533,7 +4533,7 @@ function renderRegister(e, done = false) {
     ${foTop({
       back,
       backLabel: "Back",
-      crumbs: `<a href="${home}">Dashboard</a><i>/</i><b>Register</b>`,
+      crumbs: `<a href="${home}">Events</a><i>/</i><b>Register</b>`,
     })}
     <div class="fo-scroll">
       <div class="fo-in" style="max-width:640px">
@@ -5182,7 +5182,7 @@ function obShell(content) {
     <div class="fo-scroll">
       <div class="fo-in">
         <div class="ob-top">
-          ${onboarded ? `<a href="#/dashboard" class="fo-b sm">${FI.back} Dashboard</a>` : ""}
+          ${onboarded ? `<a href="#/events" class="fo-b sm">${FI.back} Events</a>` : ""}
           <span style="white-space:nowrap">Step ${s + 1} of ${OB_STEPS.length}</span>
           <div class="ob-bar" aria-hidden="true"><span style="width:${((s + 1) / OB_STEPS.length) * 100}%"></span></div>
           <span class="lg:hidden" style="white-space:nowrap">${pct}% profile</span>
@@ -5222,7 +5222,7 @@ function obSubmit() {
   // Done: the company profile is filled once, then the admin lands on events
   onboarded = true;
   try { localStorage.setItem("demoOnboarded", "1"); } catch {}
-  location.hash = "#/dashboard";
+  location.hash = "#/events";
   toast(`Onboarding complete · ${ob.team.length} ${ob.team.length === 1 ? "person" : "people"} in your team`);
 }
 
@@ -5412,12 +5412,9 @@ function route() {
 
   currentPage = page || "events";
   let landing = false; // events page (Live & Upcoming / Past): gets the tinted canvas
-  if (page === "dashboard") {
-    if (!isAdmin()) return location.replace("#/events");
-    exState.animate = true;
-    exState.event = null;
-    app.innerHTML = renderDashboard();
-  } else if (page === "insights") {
+  // The Dashboard has been taken out: old #/dashboard links land on Events > Live & Upcoming
+  if (page === "dashboard") return location.replace("#/events");
+  if (page === "insights") {
     // Top 10 Collective intelligence, from the slider's "View more"
     landing = true;
     activeTab = DEFAULT_TAB;
@@ -5516,11 +5513,6 @@ function navHTML() {
 
   return `
     <div class="fo-lbl" style="padding-top:4px">My Network</div>
-    ${isAdmin() ? `
-    <!-- Admin: analytics overview, above the events -->
-    <a href="#/dashboard" data-close-drawer aria-current="${currentPage === "dashboard" ? "page" : "false"}" class="fo-nav-row ${currentPage === "dashboard" ? "on" : ""}">
-      ${FI.chart}<span style="flex:1">Dashboard</span>
-    </a>` : ""}
     <button type="button" data-toggle-events aria-expanded="${eventsMenuOpen}" class="fo-nav-row" style="color:var(--fg);font-weight:550">
       ${FI.grid}
       <span style="flex:1">${isAdmin() ? "Events & Collabs" : "Events"}</span>
@@ -5606,7 +5598,7 @@ document.addEventListener("click", (ev) => {
   const ok = ev.target.closest("[data-role-ok]");
   if (ok && (ev.target === ok || ok.tagName === "BUTTON")) {
     document.getElementById("modalRoot").innerHTML = "";
-    const home = isAdmin() ? "#/dashboard" : "#/events";
+    const home = "#/events";
     if (location.hash === home) return route();
     return (location.hash = home);
   }
